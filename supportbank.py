@@ -37,6 +37,9 @@ def main(argv):
                 string = i.ljust(maxlengths[1]) + " | "
                 balance = str(accounts[i])
                 balance = balance[:balance.find(".")+3]
+                index = len(balance) - balance.find(".")
+                if index < 3:
+                    balance = balance.ljust(len(balance)+(3-index),'0')
                 print("| " + string + balance.rjust(10) + "|")
         else:
             account = response.split("[")[len(response.split("["))-1]
@@ -50,8 +53,15 @@ def main(argv):
                 for i in transactions:
                     if account==i[1] or account==i[2]:
                         string = "| "
-                        for j in range(len(i)):
+                        for j in range(len(i)-1):
                             string = string + i[j].ljust(maxlengths[j]) + " | "
+
+                        balance = i[len(i)-1]
+                        index = len(balance) - balance.find(".")
+                        if index < 3:
+                            balance = balance.ljust(len(balance)+(3-index),'0')
+
+                        string = string + balance.rjust(maxlengths[len(i)-1]) + " | "
                         print(string)
 
 if __name__ == "__main__":
