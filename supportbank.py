@@ -1,30 +1,39 @@
 import csv
 import sys
-from pprint import pprint
+import re
+csvfiles = ['Transactions2014.csv','DodgyTransactions2015.csv']
 
 def main(argv):
     transactions = []
     accounts = {}
     maxlengths = [0,0,0,0,0]
-    with open('Transactions2014.csv', newline='') as csvfile:
-        csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        index = 0
-        for row in csvreader:
-            if index > 0:
-                transactions.append(row)
-                for i in range(len(row)):
-                    if len(row[i]) > maxlengths[i]:
-                        maxlengths[i] = len(row[i])
-                if row[1] in accounts:
-                    accounts[row[1]] -= float(row[4])
-                else: accounts[row[1]] = 0 - float(row[4])
-                if row[2] in accounts:
-                    accounts[row[2]] += float(row[4])
-                else: accounts[row[2]] = float(row[4])
+    for file in csvfiles:
+        with open(file, newline='') as csvfile:
+            csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+            index = 0
+            for row in csvreader:
+                if index > 0:
+                    if re.fullmatch("^[0-9]{2}/[0-9]{2}/[0-9]{4}$",row[0]) != None and \
+                    re.fullmatch("^[0-9]+\.?[0-9]*$",row[4]) != None:
+                        transactions.append(row)
+                        for i in range(len(row)):
+                            if len(row[i]) > maxlengths[i]:
+                                maxlengths[i] = len(row[i])
+                        if row[1] in accounts:
+                            accounts[row[1]] -= float(row[4])
+                        else: accounts[row[1]] = 0 - float(row[4])
+                        if row[2] in accounts:
+                            accounts[row[2]] += float(row[4])
+                        else: accounts[row[2]] = float(row[4])
+                    else:
+                        print("invalid row: ")
+                        print(row)
 
-            index += 1
+
+                index += 1
 
     response = ""
+    print()
     while response != "Quit":
         print("Enter a command('List All'/'List[accountname]'/'Quit'):")
         response = input()
