@@ -2,42 +2,62 @@ import csv
 import sys
 import re
 import logging
+import json
 csvfiles = ['Transactions2014.csv','DodgyTransactions2015.csv']
+transactions = []
+accounts = {}
+maxlengths = [0,0,0,0,0]
 
 logging.basicConfig(filename='SupportBank.log',filemode='w',
 level=logging.DEBUG)
 
+def readRow(row):
+    #takes a list, example:['01/03/2015', 'Ben B', 'Sam N', 'Lunch', '3.80']
+    if re.fullmatch("(^[0-9]{2}/[0-1][0-9]/20[0-9]{2}$)|(^20[0-9]{2}-[0-1][0-9]-[0-9]{2}$)",row[0]) != None and \
+    re.fullmatch("^[0-9]+\.?[0-9]*$",row[4]) != None:
+        transactions.append(row)
+        for i in range(len(row)):
+            if len(row[i]) > maxlengths[i]:
+                maxlengths[i] = len(row[i])
+        if row[1] in accounts:
+            accounts[row[1]] -= float(row[4])
+        else: accounts[row[1]] = 0 - float(row[4])
+        if row[2] in accounts:
+            accounts[row[2]] += float(row[4])
+        else: accounts[row[2]] = float(row[4])
+    else:
+        logging.info("Row ignored, invalid data:" + str(row))
+
+def importjson(path):
+    with open(path) as jsonfile:
+        data = json.load(jsonfile)
+        for dict in data:
+            row = []
+            row.append(str(dict["date"]))
+            row.append(str(dict["fromAccount"]))
+            row.append(str(dict["toAccount"]))
+            row.append(str(dict["narrative"]))
+            row.append(str(dict["amount"]))
+            readRow(row)
+        logging.info("Imported file:" + str(path))
+
+def importcsv(path):
+    with open(path, newline='') as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        index = 0
+        for row in csvreader:
+            if index > 0:
+                readRow(row)
+            index += 1
+        logging.info("Imported file:" + str(path))
+
 def main(argv):
-    transactions = []
-    accounts = {}
-    maxlengths = [0,0,0,0,0]
     for file in csvfiles:
-        with open(file, newline='') as csvfile:
-            csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
-            index = 0
-            for row in csvreader:
-                if index > 0:
-                    if re.fullmatch("^[0-9]{2}/[0-1][0-9]/20[0-9]{2}$",row[0]) != None and \
-                    re.fullmatch("^[0-9]+\.?[0-9]*$",row[4]) != None:
-                        transactions.append(row)
-                        for i in range(len(row)):
-                            if len(row[i]) > maxlengths[i]:
-                                maxlengths[i] = len(row[i])
-                        if row[1] in accounts:
-                            accounts[row[1]] -= float(row[4])
-                        else: accounts[row[1]] = 0 - float(row[4])
-                        if row[2] in accounts:
-                            accounts[row[2]] += float(row[4])
-                        else: accounts[row[2]] = float(row[4])
-                    else:
-                        logging.info("Row ignored, invalid data:" + str(row))
-
-                index += 1
-
+        importcsv(file)
     response = ""
     print()
     while response != "Quit":
-        print("Enter a command('List All'/'List[accountname]'/'Quit'):")
+        print("Enter a command(List All/List[accountname]/Import filename/Quit):")
         response = input()
         if response == "List All":
             string = "| " + "Account".ljust(maxlengths[1]) + " | " + \
@@ -76,7 +96,16 @@ def main(argv):
                         print(string)
             else:
                 print("Account not found")
-                logging.info("Account not found:" + "\"" + str(account)+ "\"") 
+                logging.info("Account not found:" + "\"" + str(account)+ "\"")
+        elif response.split()[0] == "Import":
+            type = response.split()[1]
+            type = type[type.find(".")+1:]
+            if type == "json":
+                importjson(response.split()[1])
+            elif type == "csv":
+                importcsv(response.split()[1])
+            elif type == "xml":
+                print()
         elif response != "Quit":
             print("invalid user response")
             logging.info("invalid user response:" + "\"" + str(response)+ "\"")
