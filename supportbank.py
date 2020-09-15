@@ -13,7 +13,7 @@ def main(argv):
             index = 0
             for row in csvreader:
                 if index > 0:
-                    if re.fullmatch("^[0-9]{2}/[0-9]{2}/[0-9]{4}$",row[0]) != None and \
+                    if re.fullmatch("^[0-9]{2}/[0-1][0-9]/20[0-9]{2}$",row[0]) != None and \
                     re.fullmatch("^[0-9]+\.?[0-9]*$",row[4]) != None:
                         transactions.append(row)
                         for i in range(len(row)):
@@ -50,7 +50,7 @@ def main(argv):
                 if index < 3:
                     balance = balance.ljust(len(balance)+(3-index),'0')
                 print("| " + string + balance.rjust(10) + "|")
-        else:
+        elif re.fullmatch("List\[[A-Z][a-z]+ ?[A-Z]?\]",response) != None:
             account = response.split("[")[len(response.split("["))-1]
             account = account[:-1]
             if account in accounts:
@@ -72,6 +72,10 @@ def main(argv):
 
                         string = string + balance.rjust(maxlengths[len(i)-1]) + " | "
                         print(string)
+            else:
+                print("Account not found")
+        elif response != "Quit":
+            print("invalid response")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
