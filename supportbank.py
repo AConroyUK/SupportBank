@@ -1,7 +1,11 @@
 import csv
 import sys
 import re
+import logging
 csvfiles = ['Transactions2014.csv','DodgyTransactions2015.csv']
+
+logging.basicConfig(filename='SupportBank.log',filemode='w',
+level=logging.DEBUG)
 
 def main(argv):
     transactions = []
@@ -26,9 +30,7 @@ def main(argv):
                             accounts[row[2]] += float(row[4])
                         else: accounts[row[2]] = float(row[4])
                     else:
-                        print("invalid row: ")
-                        print(row)
-
+                        logging.info("Row ignored, invalid data:" + str(row))
 
                 index += 1
 
@@ -74,8 +76,10 @@ def main(argv):
                         print(string)
             else:
                 print("Account not found")
+                logging.info("Account not found:" + "\"" + str(account)+ "\"") 
         elif response != "Quit":
-            print("invalid response")
+            print("invalid user response")
+            logging.info("invalid user response:" + "\"" + str(response)+ "\"")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
