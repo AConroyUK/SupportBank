@@ -34,7 +34,7 @@ class transactionHandler:
     def listAccount(self,accountname):
         if accountname in self.accounts:
             string = "| " + "Date".ljust(self.maxlengths[0]) + " | " + "From".ljust(self.maxlengths[1]) + \
-                " | " + "To".ljust(self.maxlengths[2]) + " | " + "Narritave".ljust(self.maxlengths[3]) + \
+                " | " + "To".ljust(self.maxlengths[2]) + " | " + "Description".ljust(self.maxlengths[3]) + \
                 " | " + "Amount".ljust(self.maxlengths[4]) + "|"
             print(string)
             print("-"*len(string))
