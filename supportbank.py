@@ -7,7 +7,6 @@ from datetime import datetime
 from datetime import timedelta
 import xml.etree.ElementTree as ET
 
-
 csvfiles = ['Transactions2014.csv','DodgyTransactions2015.csv']
 transactions = []
 accounts = {}
@@ -24,12 +23,10 @@ class transaction:
         self.narrative = narrative
         self.amount = amount
 
-
 def readRow(row):
     #takes a list, example:['01/03/2015', 'Ben B', 'Sam N', 'Lunch', '3.80']
     if re.fullmatch("(^[0-9]{2,4}[/-][0-9]{2}[/-][0-9]{2,4}$)|[0-9]+",row[0]) != None and \
     re.fullmatch("^[0-9]+\.?[0-9]*$",row[4]) != None:
-        #transactions.append(row)
         if re.fullmatch("(^[0-9]{2}/[0-9]{2}/[0-9]{4}$)",row[0]) != None:
             date = datetime.strptime(row[0],"%d/%m/%Y")
         elif re.fullmatch("(^[0-9]{4}-[0-9]{2}-[0-9]{2}$)",row[0]) != None:
@@ -56,13 +53,12 @@ def importjson(path):
     with open(path) as jsonfile:
         data = json.load(jsonfile)
         for dict in data:
-            row = []
-            row.append(str(dict["date"]))
-            row.append(str(dict["fromAccount"]))
-            row.append(str(dict["toAccount"]))
-            row.append(str(dict["narrative"]))
-            row.append(str(dict["amount"]))
-            readRow(row)
+            date = str(dict["date"])
+            fromAccount = str(dict["fromAccount"])
+            toAccount = str(dict["toAccount"])
+            narrative = str(dict["narrative"])
+            amount = str(dict["amount"])
+            readRow([date,fromAccount,toAccount,narrative,amount])
     logging.info("Imported file:" + str(path))
     transactions.sort(key=sortKey)
 
@@ -87,9 +83,7 @@ def importxml(path):
         parties = transaction.find('Parties')
         fromAccount = parties.find('From').text
         toAccount = parties.find('To').text
-        #print(date, fromAccount, toAccount ,description, value)
         readRow([date, fromAccount, toAccount ,description, value])
-
     logging.info("Imported file:" + str(path))
     transactions.sort(key=sortKey)
 
@@ -127,22 +121,16 @@ def main(argv):
                 print(string)
                 print("-"*len(string))
                 for i in transactions:
-
                     if account==i.fromAccount or account==i.toAccount:
                         string = "| "
                         string = string + i.date.strftime("%d/%m/%Y").ljust(maxlengths[0]) + " | "
                         string = string + i.fromAccount.ljust(maxlengths[1]) + " | "
                         string = string + i.toAccount.ljust(maxlengths[2]) + " | "
                         string = string + i.narrative.ljust(maxlengths[3]) + " | "
-
-                        # for j in range(len(i)-1):
-                        #     string = string + i[j].ljust(maxlengths[j]) + " | "
-
                         balance = i.amount
                         index = len(balance) - balance.find(".")
                         if index < 3:
                             balance = balance.ljust(len(balance)+(3-index),'0')
-
                         string = string + balance.rjust(maxlengths[4]) + " | "
                         print(string)
             else:
