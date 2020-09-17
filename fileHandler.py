@@ -18,16 +18,36 @@ class fileHandler:
         return DEBUG_LEVEL, EXPORT_FILENAME, EXPORT_FORMAT
 
     def exportAccount(self,account,filename,format):
-        if format == "csv" or format == "txt":
-            transaction_data = self.tHandler.listAccount(account,format)
-            if transaction_data != []:
-                filename += "." + format
+        transaction_data = self.tHandler.listAccount(account,format)
+        if transaction_data != []:
+            filename += "." + format
+            if format == "txt":
                 with open(filename, 'w') as exportfile:
                     for transaction in transaction_data:
                         exportfile.write(transaction + "\n")
                 logging.info("Exported account[" + account + "]")
-        else:
-            logging.info("Unrecognised file format, unable to export to " + filename)
+            elif format == "csv":
+                with open(filename, 'w') as exportfile:
+                    for transaction in transaction_data:
+                        exportfile.write(transaction[0]+","+transaction[1]+\
+                        ","+transaction[2]+","+transaction[3]+","+transaction[4]+"\n")
+                logging.info("Exported account[" + account + "]")
+            elif format == "json":
+                with open(filename, 'w') as exportfile:
+                    exportfile.write("[\n")
+                    for transaction in transaction_data[1:]:
+                        dict = {
+                            "date": str(transaction[0]),
+                            "fromAccount": str(transaction[1]),
+                            "toAccount": str(transaction[2]),
+                            "narrative": str(transaction[3]),
+                            "amount": transaction[4]
+                        }
+                        exportfile.write(json.dumps(dict, indent=2)+",\n")
+                    exportfile.write("]")
+                logging.info("Exported account[" + account + "]")
+            else:
+                logging.info("Unrecognised file format, unable to export to " + filename)
 
     def importfile(self,path):
         type = path[path.find(".")+1:]

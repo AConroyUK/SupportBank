@@ -42,8 +42,8 @@ class transactionHandler:
                 print("-"*len(string))
             elif return_file == "txt":
                 transaction_data.append(string)
-            elif return_file == "csv":
-                transaction_data.append("Date,From,To,Description,Amount")
+            else:
+                transaction_data.append(["Date","From","To","Description","Amount"])
             for i in self.transactions:
                 if accountname==i.fromAccount or accountname==i.toAccount:
                     string = "| "
@@ -60,9 +60,9 @@ class transactionHandler:
                         print(string)
                     elif return_file == "txt":
                         transaction_data.append(string)
-                    elif return_file == "csv":
-                        transaction_data.append(i.date.strftime("%d/%m/%Y")+","+i.fromAccount+\
-                        ","+i.toAccount+","+i.narrative+","+i.amount)
+                    else:
+                        transaction_data.append([i.date.strftime("%d/%m/%Y"),i.fromAccount,\
+                        i.toAccount,i.narrative,i.amount])
         else:
             print("Account not found")
             logging.info("Account not found:" + "\"" + str(accountname)+ "\"")
