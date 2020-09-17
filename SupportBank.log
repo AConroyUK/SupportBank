@@ -1,0 +1,8 @@
+INFO:root:Imported file:Transactions2014.csv
+INFO:root:Row ignored, invalid data:['01/03/2015', 'Ben B', 'Sam N', 'Lunch', 'One Cheeseburger']
+INFO:root:Row ignored, invalid data:['Last Thursday', 'Sarah T', 'Dan W', 'Beers', '5.42']
+INFO:root:Imported file:DodgyTransactions2015.csv
+INFO:root:Imported file:Transactions2012.xml
+INFO:root:Imported file:Transactions2013.json
+INFO:root:user command: Export[Jon A]
+INFO:root:Exported account[Jon A]
