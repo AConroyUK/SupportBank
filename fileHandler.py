@@ -14,15 +14,20 @@ class fileHandler:
                 configs.append(line[:-1])
             DEBUG_LEVEL = configs[0].split("=")[1]
             EXPORT_FILENAME = configs[1].split("=")[1]
-        return DEBUG_LEVEL, EXPORT_FILENAME
+            EXPORT_FORMAT = configs[2].split("=")[1]
+        return DEBUG_LEVEL, EXPORT_FILENAME, EXPORT_FORMAT
 
-    def exportAccount(self,account,filename):
-        transaction_data = self.tHandler.listAccount(account,True)
-        if transaction_data != []:
-            with open(filename, 'w') as exportfile:
-                for transaction in transaction_data:
-                    exportfile.write(transaction + "\n")
-            logging.info("Exported account[" + account + "]")
+    def exportAccount(self,account,filename,format):
+        if format == "csv" or format == "txt":
+            transaction_data = self.tHandler.listAccount(account,format)
+            if transaction_data != []:
+                filename += "." + format
+                with open(filename, 'w') as exportfile:
+                    for transaction in transaction_data:
+                        exportfile.write(transaction + "\n")
+                logging.info("Exported account[" + account + "]")
+        else:
+            logging.info("Unrecognised file format, unable to export to " + filename)
 
     def importfile(self,path):
         type = path[path.find(".")+1:]

@@ -8,7 +8,7 @@ files = ['Transactions2014.csv','DodgyTransactions2015.csv','Transactions2012.xm
 tHandler = transactionHandler.transactionHandler()
 fHandler = fileHandler.fileHandler(tHandler)
 
-DEBUG_LEVEL, EXPORT_FILENAME = fHandler.loadconfig()
+DEBUG_LEVEL, EXPORT_FILENAME, EXPORT_FORMAT = fHandler.loadconfig()
 
 logging.basicConfig(filename='SupportBank.log',filemode='w',
 level=eval(DEBUG_LEVEL))
@@ -38,7 +38,7 @@ def main(argv):
             logging.info("user command: " + str(response))
             account = response.split("[")[len(response.split("["))-1]
             account = account[:-1]
-            fHandler.exportAccount(account,EXPORT_FILENAME)
+            fHandler.exportAccount(account,EXPORT_FILENAME,EXPORT_FORMAT)
         elif response != "Quit":
             print("invalid user response")
             logging.info("invalid user response:" + "\"" + str(response)+ "\"")

@@ -31,17 +31,19 @@ class transactionHandler:
                 balance = balance.ljust(len(balance)+(3-index),'0')
             print("| " + string + balance.rjust(10) + "|")
 
-    def listAccount(self,accountname,return_file=False):
+    def listAccount(self,accountname,return_file=None):
         transaction_data = []
         if accountname in self.accounts:
             string = "| " + "Date".ljust(self.maxlengths[0]) + " | " + "From".ljust(self.maxlengths[1]) + \
                 " | " + "To".ljust(self.maxlengths[2]) + " | " + "Description".ljust(self.maxlengths[3]) + \
                 " | " + "Amount".ljust(self.maxlengths[4]) + "|"
-            if return_file == False:
+            if return_file == None:
                 print(string)
                 print("-"*len(string))
-            else:
+            elif return_file == "txt":
                 transaction_data.append(string)
+            elif return_file == "csv":
+                transaction_data.append("Date,From,To,Description,Amount")
             for i in self.transactions:
                 if accountname==i.fromAccount or accountname==i.toAccount:
                     string = "| "
@@ -54,10 +56,13 @@ class transactionHandler:
                     if index < 3:
                         balance = balance.ljust(len(balance)+(3-index),'0')
                     string = string + balance.rjust(self.maxlengths[4]) + " | "
-                    if return_file == False:
+                    if return_file == None:
                         print(string)
-                    else:
+                    elif return_file == "txt":
                         transaction_data.append(string)
+                    elif return_file == "csv":
+                        transaction_data.append(i.date.strftime("%d/%m/%Y")+","+i.fromAccount+\
+                        ","+i.toAccount+","+i.narrative+","+i.amount)
         else:
             print("Account not found")
             logging.info("Account not found:" + "\"" + str(accountname)+ "\"")
